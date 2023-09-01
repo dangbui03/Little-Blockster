@@ -5,6 +5,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
+import "@chainlink/contracts/src/v0.8/interface/AggregatorV3Interface.sol";
+
+/**
 interface AggregatorV3Interface {
   function decimals() external view returns (uint8);
 
@@ -21,6 +24,7 @@ interface AggregatorV3Interface {
     view
     returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
+ */
 
 contract FundMe {
     uint256 public number;
@@ -49,7 +53,14 @@ contract FundMe {
         // Address of the contract -> Etherium Data Feeds
         // change the USD into ETH or reverse -> through Oracle
         // 0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e - Goerli
-        AggregatorV3Interface(0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e).version()
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e);
+        (uint80 roundId, int price,uint startedAt, uint timeStamp, uint80 answeredInAround) = priceFeed.latestRoundData();
+        // (,int price,,,) = priceFeed.lastestRoundDataa()
+    }
+
+    function getVersion() public view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e);
+        return priceFeed.version();
     }
 
     function getConversionRate() public {}
