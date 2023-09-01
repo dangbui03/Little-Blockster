@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
-import "@chainlink/contracts/src/v0.8/interface/AggregatorV3Interface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 /**
 interface AggregatorV3Interface {
@@ -44,7 +44,7 @@ contract FundMe {
         // there is a variable number, and if we call the fund function and we didn't send enough value -> the number wont be update to 5
 
         // how to convert ETH to USD -> oracle
-        // block chain can't call the api or http 
+        // block chain can't call the api or http
         // chain link data feed
     }
 
@@ -53,13 +53,23 @@ contract FundMe {
         // Address of the contract -> Etherium Data Feeds
         // change the USD into ETH or reverse -> through Oracle
         // 0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e - Goerli
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e);
-        (uint80 roundId, int price,uint startedAt, uint timeStamp, uint80 answeredInAround) = priceFeed.latestRoundData();
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(
+            0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e
+        );
+        (
+            uint80 roundId,
+            int price,
+            uint startedAt,
+            uint timeStamp,
+            uint80 answeredInAround
+        ) = priceFeed.latestRoundData();
         // (,int price,,,) = priceFeed.lastestRoundDataa()
     }
 
     function getVersion() public view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e);
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(
+            0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e
+        );
         return priceFeed.version();
     }
 
