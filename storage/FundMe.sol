@@ -30,14 +30,18 @@ contract FundMe {
     uint256 public number;
     uint256 public minimumUSD = 50;
 
+    address[] public funders;// array for the address of user
+    mapping(address => uint256) public addressToAmountFunded;
+
     function fund() public payable {
         // payable using when you want to send any token
         // Want to be able to set a minimum fund amount of USD
         // 1. How do we send ETH to this contract?
         number = 5; // when reverting -> this will erase 5 in number and return gas from implement this number to 5
-        require(msg.value >= minimumUSD, "Didn't send enough!"); // 1e18 == 1 * 10 ** 18 == 100000000000000000 -> 1 ETH
-        //'msg. sender': It is always the address of the account from where the function call came from.
-        //'msg. value': The amount of Ether/Wei deposited or withdrawn by the msg. sender.
+        require(getConversionRate(msg.value) >= minimumUSD, "Didn't send enough!"); // 1e18 == 1 * 10 ** 18 == 100000000000000000 -> 1 ETH
+        // 18 decimals
+        //'msg. sender': It is always the address of the account from where the function call came from. / address call the function
+        //'msg. value': The amount of Ether/Wei deposited or withdrawn by the msg.sender. / the how much crypto currency sender send
         // require = if, else = didn't send enough
         // what is reverting?
         // like if require fail, undo any action before, and send remaining gas back,
@@ -46,14 +50,19 @@ contract FundMe {
         // how to convert ETH to USD -> oracle
         // block chain can't call the api or http
         // chain link data feed
-    }
 
-    function getPrice() public {
+        funders.push(msg.sender);
+        addressToAmountFunded[msg.sender] = msg.value;
+        // msg.value.getConversionRate(); 
+    }
+    /** Move to PriceConverter.sol
+        function getPrice() public view returns(uint256) {
         // ABI of the contract
         // Address of the contract -> Etherium Data Feeds
         // change the USD into ETH or reverse -> through Oracle
         // 0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e - Goerli
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
+        /**
+            AggregatorV3Interface priceFeed = AggregatorV3Interface(
             0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e
         );
         (
@@ -63,7 +72,11 @@ contract FundMe {
             uint timeStamp,
             uint80 answeredInAround
         ) = priceFeed.latestRoundData();
-        // (,int price,,,) = priceFeed.lastestRoundDataa()
+         * /
+        (,int256 price,,,) = priceFeed.lastestRoundDataa();
+        // ETH in terms of USD
+        // 3000.00000000
+        return uint256 (price * 1e10); // 1**10 = 10000000000
     }
 
     function getVersion() public view returns (uint256) {
@@ -73,7 +86,18 @@ contract FundMe {
         return priceFeed.version();
     }
 
-    function getConversionRate() public {}
+    function getConversionRate(uint256 ethAmount) public view returns(uint256){
+        // 3000_000000000000000000 = ETH / USD price
+        // 1_000000000000000000 ETH (amount)
+        uint256 ethPrice = getPrice();
+        uint256 ethAmountInUSD = (ethPrice * ethPrice) / 1e18;
+        // 2999.99999999999999999 -> we dont do decimal math in solidity -> 3000_000000000000000000
+        return ethAmountInUSD;
+        
+        
+    }
 
     //function withdraw() public {}
+     */
+
 }
