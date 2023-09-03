@@ -8,7 +8,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 // cant have state variable cant send ETH
 // and all function in library are internal
 library PriceConverter {
-    function getPrice() public view returns(uint256) {
+    function getPrice() internal view returns(uint256) {
         // ABI of the contract
         // Address of the contract -> Etherium Data Feeds
         // change the USD into ETH or reverse -> through Oracle
@@ -31,14 +31,14 @@ library PriceConverter {
         return uint256 (price * 1e10); // 1**10 = 10000000000
     }
 
-    function getVersion() public view returns (uint256) {
+    function getVersion() internal view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(
             0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e
         );
         return priceFeed.version();
     }
 
-    function getConversionRate(uint256 ethAmount) public view returns(uint256){
+    function getConversionRate(uint256 ethAmount) internal view returns(uint256){
         // 3000_000000000000000000 = ETH / USD price
         // 1_000000000000000000 ETH (amount)
         uint256 ethPrice = getPrice();
