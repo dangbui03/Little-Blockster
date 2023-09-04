@@ -55,11 +55,24 @@ contract FundMe {
         // chain link data feed
         
         funders.push(msg.sender);
-        addressToAmountFunded[msg.sender] = msg.value;
+        addressToAmountFunded[msg.sender] += msg.value;
         
     }
     function withdraw() public{
-        
+        // for loop
+        /*starting index, ending index, step amout */
+        for (uint256 funderIndex = 0; funderIndex < funders.length(); funderIndex++){
+            address funder = funders[funderIndex];
+            addressToAmountFunded[funder] = 0; //reset the array
+        }
+        funder = new address[](0); // another reset array way
+        // actually withdraw the funds
+        // transfer
+        // send
+        // call
+        payable(msg.sender).transfer(address(this).balance); // chuyển cho người nhận
+        // msg.sender = address
+        // payable(msg.sender) = payable address
     }
 
     /* Move to PriceConverter.sol
