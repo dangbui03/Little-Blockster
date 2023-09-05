@@ -30,10 +30,16 @@ contract FundMe {
     using PriceConverter for uint256;
 
     uint256 public number;
-    uint256 public minimumUSD = 50;
+    uint256 public minimumUSD = 50 * 1e18; // 1 * 10 ** 18
 
     address[] public funders; // array for the address of user
     mapping(address => uint256) public addressToAmountFunded;
+
+    address public owner;
+    constructor(){
+        owner = msg.sender;
+
+    }
 
     function fund() public payable {
         // payable using when you want to send any token
@@ -58,9 +64,10 @@ contract FundMe {
         addressToAmountFunded[msg.sender] += msg.value;
         
     }
-    function withdraw() public{
-        // for loop
-        /*starting index, ending index, step amout */
+    function withdraw() public onlyOwner { // but everyone can withdraw with thiss functio
+        
+
+        /*for loop -> starting index, ending index, step amout */
         for (uint256 funderIndex = 0; funderIndex < funders.length(); funderIndex++){
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0; //reset the array
@@ -82,6 +89,10 @@ contract FundMe {
 
     }
 
+    modifier onlyOwner {
+        require(msg.sender == owner, "sender iz not owner!"); // when you call any function like withdraw -> this line will go first
+        _;                                                    // and then doing the rest of code of withdraw function
+    }
     /* Move to PriceConverter.sol
         function getPrice() public view returns(uint256) {
         // ABI of the contract
