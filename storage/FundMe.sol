@@ -36,9 +36,9 @@ contract FundMe {
     mapping(address => uint256) public addressToAmountFunded;
 
     address public owner;
-    constructor(){
-        owner = msg.sender;
 
+    constructor() {
+        owner = msg.sender;
     }
 
     function fund() public payable {
@@ -46,7 +46,10 @@ contract FundMe {
         // Want to be able to set a minimum fund amount of USD
         // 1. How do we send ETH to this contract?
         number = 5; // when reverting -> this will erase 5 in number and return gas from implement this number to 5
-        require(msg.value.getConversionRate() >= minimumUSD,"Didn't send enough!"); // 1e18 == 1 * 10 ** 18 == 100000000000000000 -> 1 ETH
+        require(
+            msg.value.getConversionRate() >= minimumUSD,
+            "Didn't send enough!"
+        ); // 1e18 == 1 * 10 ** 18 == 100000000000000000 -> 1 ETH
         // msg.value.getConversionRate() ==== getConversionRate(msg.value)
         // 18 decimals
         //'msg. sender': It is always the address of the account from where the function call came from. / address call the function
@@ -59,20 +62,24 @@ contract FundMe {
         // how to convert ETH to USD -> oracle
         // block chain can't call the api or http
         // chain link data feed
-        
+
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] += msg.value;
-        
     }
-    function withdraw() public onlyOwner { // but everyone can withdraw with thiss functio
-        
+
+    function withdraw() public onlyOwner {
+        // but everyone can withdraw with thiss functio
 
         /*for loop -> starting index, ending index, step amout */
-        for (uint256 funderIndex = 0; funderIndex < funders.length(); funderIndex++){
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < funders.length;
+            funderIndex++
+        ) {
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0; //reset the array
         }
-        funder = new address[](0); // another reset array way
+        funders = new address[](0); // another reset array way
         // actually withdraw the funds
 
         // How to send Ether:
@@ -84,14 +91,14 @@ contract FundMe {
         bool sendSuccess = payable(msg.sender).send(address(this).balance);
         require(sendSuccess, "Send Failed");
         // call (forward all gas or set gas, returns bool)
-        (bool callSuccess, bytes memory dataReturned) = payable(msg.sender).call{value: address(this).balance}("");
+        (bool callSuccess, bytes memory dataReturned) = payable(msg.sender)
+            .call{value: address(this).balance}("");
         require(callSuccess, "Call Failed");
-
     }
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         require(msg.sender == owner, "sender iz not owner!"); // when you call any function like withdraw -> this line will go first
-        _;                                                    // and then doing the rest of code of withdraw function
+        _; // and then doing the rest of code of withdraw function
     }
     /* Move to PriceConverter.sol
         function getPrice() public view returns(uint256) {
@@ -131,5 +138,4 @@ contract FundMe {
         // 2999.99999999999999999 -> we dont do decimal math in solidity -> 3000_000000000000000000
         return ethAmountInUSD;        
     } */
-
 }
