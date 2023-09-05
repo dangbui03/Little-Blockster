@@ -67,12 +67,19 @@ contract FundMe {
         }
         funder = new address[](0); // another reset array way
         // actually withdraw the funds
-        // transfer
-        // send
-        // call
-        payable(msg.sender).transfer(address(this).balance); // chuyển cho người nhận
+
+        // How to send Ether:
         // msg.sender = address
         // payable(msg.sender) = payable address
+        // transfer (2300gas, throws err)
+        payable(msg.sender).transfer(address(this).balance); // chuyển cho người nhận
+        // send (2300 gas, return bool)
+        bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        require(sendSuccess, "Send Failed");
+        // call (forward all gas or set gas, returns bool)
+        (bool callSuccess, bytes memory dataReturned) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call Failed");
+
     }
 
     /* Move to PriceConverter.sol
