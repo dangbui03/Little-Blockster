@@ -1,11 +1,11 @@
-// Get funds from users
-// Withdraw funds
-// Set a minimum funding value in USD
-
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier:MIT
 pragma solidity ^0.8.8;
 
 import "./PriceConverter.sol";
+
+// Get funds from users
+// Withdraw funds
+// Set a minimum funding value in USD
 
 /**
 interface AggregatorV3Interface {
@@ -113,7 +113,13 @@ contract FundMe {
     
     //what happens if someone sends this contract ETH without calling the fund function
     // receive() - fallback()
+    receive() external payable {
+        fund();
+    }
 
+    fallback() external payable {
+        fund();
+    }
 
     /* Move to PriceConverter.sol
         function getPrice() public view returns(uint256) {
