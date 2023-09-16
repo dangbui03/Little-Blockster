@@ -25,20 +25,26 @@ interface AggregatorV3Interface {
     returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
  */
+error NotOwner();
 
 contract FundMe {
     using PriceConverter for uint256;
 
     uint256 public number;
-    uint256 public minimumUSD = 50 * 1e18; // 1 * 10 ** 18
+    uint256 public constant MINIMUM_USD = 50 * 1e18; // 1 * 10 ** 18
+    // constant reduce the amount of gas
+    // 21,415 gas - constant
+    // 23,515 gas - non-constant
+    // 21,415 * 141000000000 = $9,058545
+    // 23,515 * 141000000000 = $9,946845 -> approximately $1 more
 
     address[] public funders; // array for the address of user
     mapping(address => uint256) public addressToAmountFunded;
 
-    address public owner;
+    address public immutable i_owner;
 
     constructor() {
-        owner = msg.sender;
+        i_owner = msg.sender;
     }
 
     function fund() public payable {
@@ -47,7 +53,7 @@ contract FundMe {
         // 1. How do we send ETH to this contract?
         number = 5; // when reverting -> this will erase 5 in number and return gas from implement this number to 5
         require(
-            msg.value.getConversionRate() >= minimumUSD,
+            msg.value.getConversionRate() >= MINIMUM_USD,
             "Didn't send enough!"
         ); // 1e18 == 1 * 10 ** 18 == 100000000000000000 -> 1 ETH
         // msg.value.getConversionRate() ==== getConversionRate(msg.value)
@@ -68,7 +74,7 @@ contract FundMe {
     }
 
     function withdraw() public onlyOwner {
-        // but everyone can withdraw with thiss functio
+        // but everyone can withdraw with thiss function
 
         /*for loop -> starting index, ending index, step amout */
         for (
@@ -97,9 +103,18 @@ contract FundMe {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "sender iz not owner!"); // when you call any function like withdraw -> this line will go first
+        //require(msg.sender == i_owner, notOwner()); // when you call any function like withdraw -> this line will go first
+        // You can reduce the gas cosume by doing this
+        if(msg.sender != i_owner) {
+            revert NotOwner();
+        }
         _; // and then doing the rest of code of withdraw function
     }
+    
+    //what happens if someone sends this contract ETH without calling the fund function
+    // receive() - fallback()
+
+
     /* Move to PriceConverter.sol
         function getPrice() public view returns(uint256) {
         // ABI of the contract
